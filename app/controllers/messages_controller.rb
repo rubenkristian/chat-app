@@ -7,8 +7,16 @@ class MessagesController < ApplicationController
     if room.nil?
       render json: { status: 'not found', message: 'Cannot find the room' }, status: 404
     end
-    messages = Message.where(room_chat:room.id).page(params[:page]).per(10)
-    render json: { data: messages, current_page: messages.current_page, total_pages: messages.total_pages, total_count: messages.total_count }
+
+    # threshold_id = params[:threshold_id]
+
+    if params[:threshold_id]
+      messages = Message.where(room_chat:room.id).where('id < ?', params[:threshold_id]).order(id: :desc).limit(params[:size]).all
+    else
+      messages = Message.where(room_chat:room.id).order(id: :desc).limit(params[:size]).all
+    end
+
+    render json: { data: messages, last: messages.size > 0 ? messages.last.id : nil }
   end
 
   def send_msg
@@ -24,6 +32,7 @@ class MessagesController < ApplicationController
     new_message = Message.new(message_params)
 
     if new_message.save
+      ActionCable.server.broadcast "chat_#{message_params[:room_chat_id]}", {id: new_message.id, body: new_message.body, from_name: new_message.from_name, from_id: new_message.from_id, created_at: new_message.created_at, updated_at: new_message.updated_at}
       render json: { status: 'success', message: 'success send message', data: new_message }, status: :created
     else
       render json: { status: 'failed', message: 'failed to send message' }, status: :unprocessable_entity

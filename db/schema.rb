@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_05_153921) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_08_124012) do
   create_table "messages", force: :cascade do |t|
     t.string "from_id"
     t.string "from_name"
@@ -25,6 +25,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_05_153921) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "creator"
   end
 
   add_foreign_key "messages", "room_chats"
