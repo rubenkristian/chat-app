@@ -1,12 +1,11 @@
 class RoomChatController < ApplicationController
     def index
         room_chat = RoomChat.order(updated_at: :desc).page(params[:page]).per(params[:size])
-        render json: { data: room_chat, current_page: room_chat.current_page, total_pages: room_chat.total_pages, total_count: room_chat.total_count }
+        render json: { data: room_chat, current_page: room_chat.current_page, total_pages: room_chat.total_pages, total_count: room_chat.total_count }, status: :ok
     end
 
     def show
         room = RoomChat.find(params[:room_id])
-
         if room
             render json: { status: 'found', message: 'room founded', data: room }, status: :ok
         else

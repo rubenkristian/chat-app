@@ -22,4 +22,16 @@ class RoomChatControllerTest < ActionDispatch::IntegrationTest
     post '/room_chat/add', params: {name: nil, creator: '1234'}
     assert_response :unprocessable_entity
   end
+
+  test "get list room chat" do
+    room1 = RoomChat.create(name: "Hello1", creator: "1234")
+    room2 = RoomChat.create(name: "Hello2", creator: "1234")
+
+    get '/room_chat', params: { page: 1, size: 20 }
+    json_response = JSON.parse(response.body)
+    assert_equal room1.name, json_response['data'][1]['name']
+    assert_equal room2.name, json_response['data'][0]['name']
+    assert_equal 1, json_response['current_page']
+    assert_response :ok
+  end
 end
