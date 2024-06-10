@@ -8,8 +8,6 @@ class MessagesController < ApplicationController
       render json: { status: 'not found', message: 'Cannot find the room' }, status: 404
     end
 
-    # threshold_id = params[:threshold_id]
-
     if params[:threshold_id]
       messages = Message.where(room_chat:room.id).where('id < ?', params[:threshold_id]).order(id: :desc).limit(params[:size]).all
     else
@@ -22,8 +20,6 @@ class MessagesController < ApplicationController
   def send_msg
     message_params = params.require(:message).permit(:from_id,:from_name,:body,:room_chat_id)
     room = RoomChat.find(message_params[:room_chat_id])
-    print 'hai'
-    print message_params[:room_chat_id]
     if room.nil?
       render json: { status: 'failed', message: 'cannot find room'}, status: :unprocessable_entity
       return
